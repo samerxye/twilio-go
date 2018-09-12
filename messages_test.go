@@ -48,7 +48,7 @@ func TestSendMessage(t *testing.T) {
 	t.Parallel()
 	client, s := getServer(sendMessageResponse)
 	defer s.Close()
-	msg, err := client.Messages.SendMessage(from, to, "twilio-go testing!", nil)
+	msg, err := client.Messages.SendMessage(from, to, "twilio-go testing!", "http://localhost:8000", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

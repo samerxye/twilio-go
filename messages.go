@@ -97,11 +97,12 @@ func (m *MessageService) Create(ctx context.Context, data url.Values) (*Message,
 }
 
 // SendMessage sends an outbound Message with the given body or mediaURLs.
-func (m *MessageService) SendMessage(from string, to string, body string, mediaURLs []*url.URL) (*Message, error) {
+func (m *MessageService) SendMessage(from string, to string, body string, statusCallback string, mediaURLs []*url.URL) (*Message, error) {
 	v := url.Values{}
 	v.Set("Body", body)
 	v.Set("From", from)
 	v.Set("To", to)
+	v.Set("StatusCallback", statusCallback)
 	for _, mediaURL := range mediaURLs {
 		v.Add("MediaUrl", mediaURL.String())
 	}
