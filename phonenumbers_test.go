@@ -5,8 +5,6 @@ import (
 	"net/url"
 	"testing"
 	"time"
-
-	"github.com/kevinburke/rest"
 )
 
 func TestGetNumberPage(t *testing.T) {
@@ -35,13 +33,13 @@ func TestBuyNumber(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected to get an error, got nil")
 	}
-	rerr, ok := err.(*rest.Error)
+	rerr, ok := err.(*TwilioError)
 	if !ok {
-		t.Fatal("couldn't cast err to a rest.Error")
+		t.Fatal("couldn't cast err to a TwilioError")
 	}
 	expected := "+1foobar is not a valid number"
-	if rerr.Title != expected {
-		t.Errorf("expected Title to be %s, got %s", expected, rerr.Title)
+	if rerr.Message != expected {
+		t.Errorf("expected Title to be %s, got %s", expected, rerr.Message)
 	}
 	if rerr.Status != 400 {
 		t.Errorf("expected StatusCode to be 400, got %d", rerr.Status)

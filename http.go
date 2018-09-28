@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -131,14 +130,17 @@ func init() {
 	}
 }
 
-// An error returned by the Twilio API. We don't want to expose this - let's
-// try to standardize on the fields in the HTTP problem spec instead.
-type twilioError struct {
+// An error returned by the Twilio API.
+type TwilioError struct {
 	Code     int    `json:"code"`
 	Message  string `json:"message"`
 	MoreInfo string `json:"more_info"`
 	// This will be ignored in favor of the actual HTTP status code
 	Status int `json:"status"`
+}
+
+func (e *TwilioError) Error() string {
+	return fmt.Sprintf("status %d, code %d: %s", e.Status, e.Code, e.Message)
 }
 
 func parseTwilioError(resp *http.Response) error {
@@ -149,20 +151,16 @@ func parseTwilioError(resp *http.Response) error {
 	if err := resp.Body.Close(); err != nil {
 		return err
 	}
-	rerr := new(twilioError)
+	rerr := new(TwilioError)
 	err = json.Unmarshal(resBody, rerr)
+
 	if err != nil {
 		return fmt.Errorf("invalid response body: %s", string(resBody))
 	}
 	if rerr.Message == "" {
 		return fmt.Errorf("invalid response body: %s", string(resBody))
 	}
-	return &rest.Error{
-		Title:  rerr.Message,
-		Type:   rerr.MoreInfo,
-		ID:     strconv.Itoa(rerr.Code),
-		Status: resp.StatusCode,
-	}
+	return rerr
 }
 
 // NewFaxClient returns a Client for use with the Twilio Fax API.

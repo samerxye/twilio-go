@@ -7,8 +7,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/kevinburke/rest"
 )
 
 // invalid status here on purpose to check we use a different one.
@@ -31,18 +29,18 @@ func Test404Error(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected non-nil error, got nil")
 	}
-	rerr, ok := err.(*rest.Error)
+	rerr, ok := err.(*TwilioError)
 	if !ok {
-		t.Fatalf("expected to convert err %v to rest.Error, couldn't", err)
+		t.Fatalf("expected to convert err %v to TwilioError, couldn't", err)
 	}
-	if !strings.Contains(rerr.Title, "The requested resource /2010-04-01") {
-		t.Errorf("expected Title to contain 'The requested resource', got %s", rerr.Title)
+	if !strings.Contains(rerr.Message, "The requested resource /2010-04-01") {
+		t.Errorf("expected Message to contain 'The requested resource', got %s", rerr.Message)
 	}
-	if rerr.ID != "20404" {
-		t.Errorf("expected ID to be 20404, got %s", rerr.ID)
+	if rerr.Code != 20404 {
+		t.Errorf("expected Code to be 20404, got %d", rerr.Code)
 	}
-	if rerr.Type != "https://www.twilio.com/docs/errors/20404" {
-		t.Errorf("expected Type to be a Twilio URL, got %s", rerr.Type)
+	if rerr.MoreInfo != "https://www.twilio.com/docs/errors/20404" {
+		t.Errorf("expected MoreInfo to be a Twilio URL, got %s", rerr.MoreInfo)
 	}
 	if rerr.Status != 404 {
 		t.Errorf("expected StatusCode to be 404, got %d", rerr.Status)
