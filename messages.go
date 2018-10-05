@@ -96,11 +96,25 @@ func (m *MessageService) Create(ctx context.Context, data url.Values) (*Message,
 	return msg, err
 }
 
-// SendMessage sends an outbound Message with the given body or mediaURLs.
+// SendMessage sends an outbound Message using a sender ID.
 func (m *MessageService) SendMessage(from string, to string, body string, statusCallback string, mediaURLs []*url.URL) (*Message, error) {
 	v := url.Values{}
 	v.Set("Body", body)
 	v.Set("From", from)
+	v.Set("To", to)
+	v.Set("StatusCallback", statusCallback)
+	for _, mediaURL := range mediaURLs {
+		v.Add("MediaUrl", mediaURL.String())
+	}
+	return m.Create(context.Background(), v)
+}
+
+// SendCopilotMessage sends an outbound Message using a Messaging Service. The Sender ID
+// will be chosen by the Messaging Copilot.
+func (m *MessageService) SendCopilotMessage(sid string, to string, body string, statusCallback string, mediaURLs []*url.URL) (*Message, error) {
+	v := url.Values{}
+	v.Set("Body", body)
+	v.Set("MessagingServiceSid", sid)
 	v.Set("To", to)
 	v.Set("StatusCallback", statusCallback)
 	for _, mediaURL := range mediaURLs {
